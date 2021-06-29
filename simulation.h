@@ -37,6 +37,7 @@ class Simulation
         void add_subject(Subject&& s);
         void run(); //This method starts the simulation but locks execution because theading is not supported in WASM
     private:
+        void setStrategy(); // Determine the strategy for the subjects
         void wall_collision(Subject& s);
         void subject_collision(Subject& s1, Subject& s2);
         void static_collision(Subject& s1, Subject& s2, bool emergency);

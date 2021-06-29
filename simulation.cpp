@@ -19,6 +19,14 @@
 #include <emscripten.h>
 #include <math.h>
 
+#include "MovementStrategy.h"
+#include "RegularMovementStrategy.cpp"
+#include "LockdownMovementStrategy.cpp"
+
+// create objects of the concrete strategies
+corsim::RegularMovementStrategy regularStrategy;
+corsim::LockdownMovementStrategy lockdownStrategy;
+
 namespace corsim
 {
 
@@ -38,12 +46,34 @@ void Simulation::run()
     }
 
     running = true;
+    this->setStrategy(); 
 
     while(true)
     {
         this->tick();
         emscripten_sleep(tick_speed);
     }
+}
+
+// Determine the strategy for the subjects
+void Simulation::setStrategy()
+{
+    // Go through all the subjects and determine the strategy for each subject
+    for (int i = 0; i < this->_subjects.size(); i++)
+    {
+        this->_subjects.at(i).setMovement(&regularStrategy);
+        // If the subject is <= 25% it may move
+        if (i < (this->_subjects.size() * 0.25))
+        {
+            // Set the default movement strategy
+            this->_subjects.at(i).setMovement(&regularStrategy);
+        }
+        else
+        {
+            // set lockdown movement strategy for 75% of the subjects
+            this->_subjects.at(i).setMovement(&lockdownStrategy);
+        }
+    }    
 }
 
 int counter  = 0;
@@ -78,8 +108,7 @@ void Simulation::tick()
 
     for(Subject& s : _subjects)
     {
-        s.set_x(s.x() + s.dx() * dt);
-        s.set_y(s.y() + s.dy() * dt);
+        s.runStrategy(dt);
 
         if(s.infected())
         {
