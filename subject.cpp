@@ -93,6 +93,25 @@ namespace corsim
         return sqrt(_dx * _dx + _dy * _dy);
     }
 
+    // B2 Keep track of the time of an infected subject
+    int Subject::infectionTime()
+    {
+        return this->_infectionTime;
+    }
+
+    // B2 Increase the infectiontime
+    void Subject::increaseInfectionTime()
+    {
+        this->_infectionTime++;
+    }
+
+    // B2 Cure the subject and reset the infectiontimer
+    void Subject::notInfected()
+    {
+        this->_infected = false;
+        this->_infectionTime = 0;
+    }
+
     // Check the strategy thats needed to run for the movement
     void Subject::setMovement(MovementStrategy *strategy)
     {

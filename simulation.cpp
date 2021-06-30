@@ -30,8 +30,10 @@ corsim::LockdownMovementStrategy lockdownStrategy;
 namespace corsim
 {
 
-Simulation::Simulation(int width, int height, std::unique_ptr<Canvas> canvas, std::unique_ptr<StatisticsHandler> sh) : 
-    _sim_width{width}, _sim_height{height}, _canvas{std::move(canvas)}, _sh{std::move(sh)} {}
+Simulation::Simulation(int width, int height, int infectionTime, std::unique_ptr<Canvas> canvas, std::unique_ptr<StatisticsHandler> sh) : 
+    _sim_width{width}, _sim_height{height}, _canvas{std::move(canvas)}, _sh{std::move(sh)} {
+        this->infectionTime = infectionTime;
+    }
 
 void Simulation::add_subject(Subject&& s)
 {
@@ -113,7 +115,34 @@ void Simulation::tick()
         if(s.infected())
         {
             numberInfected++;
+
+            // B2 Keep track of the infectiontime
+            s.increaseInfectionTime();
+
+            // B2 If infectiontime is equal to the default subject is not infected anymore
+            if(s.infectionTime() == this->infectionTime)
+            {
+                s.notInfected();
+            }
         }
+    }
+    
+    // B2 If 25% is infected, use lockdown strategy else use regular (WIP)
+    if(numberInfected >= 50)
+    {
+        // B2 Go for total lockdown
+        for (int i = 0; i < this->_subjects.size(); i++)
+        {
+            this->_subjects.at(i).setMovement(&lockdownStrategy);
+        }  
+    } 
+    else if (numberInfected <= 20)
+    {
+        // B2 Freedom! (WIP: Add speed ticker)
+        for (int i = 0; i < this->_subjects.size(); i++)
+        {
+            this->_subjects.at(i).setMovement(&regularStrategy);
+        }  
     }
 
     if(counter % 30 == 0)

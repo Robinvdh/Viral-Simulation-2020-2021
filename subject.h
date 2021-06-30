@@ -38,6 +38,9 @@ namespace corsim
             void set_dy(double dy);
             bool infected();
             void infect();
+            void notInfected();
+            int infectionTime();
+            void increaseInfectionTime();
             double angle();
             double speed();
             void setMovement(MovementStrategy *strategy); // Define movement for subject
@@ -46,6 +49,7 @@ namespace corsim
             double _x = 0,_y = 0, _dx = 0, _dy = 0;
             bool _infected = false;
             int _radius = 0;
+            int _infectionTime = 0;
 
             MovementStrategy *_strategy;
     };
